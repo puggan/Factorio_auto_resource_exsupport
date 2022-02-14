@@ -1,0 +1,9 @@
+{
+	"name": "auto-resource",
+	"version": "0.0.1",
+	"title": "auto resource",
+	"author": "asd",
+	"dependencies": ["base >= 1.1.0"],
+	"description": "auto resource",
+	"factorio_version": "1.1"
+}
