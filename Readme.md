@@ -6,8 +6,9 @@
 * Do not support previous save because game don't give a API to read all entities. The script only can get notify event by player building or robot building. If you load a previous save, game will run but the mod will not able to recognize all entities you built, you need rebuild them.
 * May not work with some Mod.
 
-# Demo Video
-TBD
+# Demo
+* Video : TBD
+* Screenshot: ![](https://github.com/njikmf/Factorio_auto_resource/blob/master/Capture.PNG)
 
 # How it works
 * When you build a furnace/chest/machine/... the mod will remember it and collect production, add ingredients preiodicty. Because the lua API don't give such a "production complete" event notify, the script check this every XX ms.
