@@ -808,7 +808,7 @@ script.on_event(defines.events.on_entity_cloned, on_entity_cloned)
 
 local _bucket=1
 script.on_event(defines.events.on_tick, function(event)
-	if 0 == (event.tick%(10)) then	
+	if 0 == (event.tick%(5)) then	
 		harvest_feed(_bucket)
 		_bucket=_bucket+1
 		if _bucket>BUCKET then
