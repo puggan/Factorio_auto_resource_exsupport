@@ -4,6 +4,6 @@
 	"title": "auto resource",
 	"author": "asd",
 	"dependencies": ["base >= 1.1.0"],
-	"description": "This mod collect and distribute most resources automatically, just like play classic RTS game. ",
+	"description": "This mod collect and distribute most resources automatically, just like play classic RTS game. Don't need tons of belt/inserter/pipe anymore :)",
 	"factorio_version": "1.1"
 }

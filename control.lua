@@ -456,7 +456,7 @@ function do_fuel(player,entity)
 	for k1,v1 in pairs(_fuel_list[entity.prototype.name]) do
 		for k2,v2 in ipairs(v1) do
 			local n=MAX_FUEL
-			if "water"==v2 or "boiler"==entity.prototype.name then
+			if "water"==v2 then
 				n=9999
 			end
 			
@@ -641,7 +641,7 @@ function on_sel_change(event)
 	end
 end
 
-function on_res_click(event)
+function on_gui_click(event)
 	if is_fluid(event.element.name) then
 		return
 	end
@@ -701,6 +701,7 @@ function create_gui(root,index)
 		end
 		gui[index].restable.add{type="sprite-button",sprite=str,name=k1,}
 	end
+
 end
 
 function show()
@@ -807,18 +808,20 @@ script.on_event(defines.events.on_entity_cloned, on_entity_cloned)
 
 local _bucket=1
 script.on_event(defines.events.on_tick, function(event)
-	if 0 == (event.tick%(4)) then	
+	if 0 == (event.tick%(10)) then	
 		harvest_feed(_bucket)
 		_bucket=_bucket+1
 		if _bucket>BUCKET then
 			_bucket=1
 		end
-		show()
 	end
 	
+	if 0 == (event.tick%(12)) then
+		show()
+	end
 end)
 
-script.on_event(defines.events.on_gui_click, on_res_click)
+script.on_event(defines.events.on_gui_click, on_gui_click)
 script.on_event(defines.events.on_gui_selection_state_changed, on_sel_change)
 script.on_event(defines.events.on_entity_died, on_entity_died)
 script.on_event(defines.events.on_entity_destroyed, on_entity_destroyed)
