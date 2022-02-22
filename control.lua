@@ -318,7 +318,7 @@ end
 function harvest_chest(entity)
 	local inventory=entity.get_output_inventory()
 	if inventory==nil then
-		game.print("no inventory")
+		game.print(entity.prototype.name.." no inventory")
 		return
 	end
 	
@@ -457,7 +457,7 @@ function do_fuel(player,entity)
 		for k2,v2 in ipairs(v1) do
 			local n=MAX_FUEL
 			if "water"==v2 or "boiler"==entity.prototype.name then
-				n=2000000000
+				n=9999
 			end
 			
 			local n1=read_entity(entity,v2)
@@ -566,7 +566,6 @@ function setmax(n)
 end
 
 function harvest_feed_entity(player,e)
-	--setmax(250000)
 	local entity=e.entity
 	--print_inventory(entity)
 	
@@ -741,7 +740,6 @@ function new_entity(entity)
 	end
 	
 	local player=entity.last_user.index
-	--game.print("player "..entity.last_user.index.." entity "..entity.unit_number.." bucket "..lastaddentityindex[player])
 	entitieslist[player][lastaddentityindex[player]][entity.unit_number]={entity=entity}
 	local e=entitieslist[player][lastaddentityindex[player]][entity.unit_number]
 	if entitiesidx[entity.unit_number]~=nil then
@@ -763,13 +761,11 @@ end
 
 function on_built_entity(event)
 	local pt=event.created_entity.prototype
-	--game.print("new "..pt.name)
 	new_entity(event.created_entity)
 end
 
 function on_entity_cloned(event)
 	local pt=event.destination.prototype
-	--game.print("clone "..pt.name)
 	new_entity(event.destination)
 end
 
@@ -788,25 +784,21 @@ function remove_entity(entity)
 		return
 	end
 	
-	--game.print("remove "..entity.prototype.name)
 	entitieslist[p.playerid][p.idx][entity.unit_number]=nil
 	entitiesidx[entity.unit_number]=nil
 end
 
 function on_entity_died (event)
-	--game.print("DIE "..event.entity.prototype.name)
 	remove_entity(event.entity)
 end
 
 function on_entity_destroyed (event)
-	--game.print("DESTROY "..event.entity.prototype.name)
 	remove_entity(event.entity)
 end
 
 
 
 function on_player_mined_entity (event)
-	--game.print("mine "..event.entity.prototype.name.." id "..event.entity.unit_number)
 	remove_entity(event.entity)
 end
 
@@ -816,7 +808,6 @@ script.on_event(defines.events.on_entity_cloned, on_entity_cloned)
 local _bucket=1
 script.on_event(defines.events.on_tick, function(event)
 	if 0 == (event.tick%(4)) then	
-		--game.print(event.tick)
 		harvest_feed(_bucket)
 		_bucket=_bucket+1
 		if _bucket>BUCKET then
