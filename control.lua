@@ -637,7 +637,9 @@ function on_sel_change(event)
 	if "gui_ft_setting"==event.element.name then
 		furnace_type=ft_option[event.element.selected_index]
 		furnace_type=ft_map[furnace_type]
-		game.get_player(event.player_index).gui.top["furnace_type"].caption="FT="..furnace_type
+		if nil~=furnace_type then
+			game.get_player(event.player_index).gui.top["furnace_type"].caption="FT="..furnace_type
+		end
 	end
 end
 
