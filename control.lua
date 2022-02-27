@@ -101,7 +101,7 @@ local Ksp={
 }
 
 function init()
-	local store100M={
+	local store1M={
 		"iron-ore",
 		"copper-ore",
 		"uranium-ore",
@@ -189,7 +189,7 @@ function init()
 			end
 		end
 		
-		f(store100M,1000000)
+		f(store1M,1000000)
 		f(store1K,1000)
 		f(store25K,25000)
 		f(store200,200)
@@ -742,6 +742,10 @@ function new_entity(entity)
 	   return
 	end
 	
+	if nil==entity.last_user then
+		game.print(entity.prototype.name.." has no last_user")
+		return
+	end
 	local player=entity.last_user.index
 	entitieslist[player][lastaddentityindex[player]][entity.unit_number]={entity=entity}
 	local e=entitieslist[player][lastaddentityindex[player]][entity.unit_number]
@@ -795,12 +799,6 @@ function on_entity_died (event)
 	remove_entity(event.entity)
 end
 
-function on_entity_destroyed (event)
-	remove_entity(event.entity)
-end
-
-
-
 function on_player_mined_entity (event)
 	remove_entity(event.entity)
 end
@@ -824,9 +822,16 @@ script.on_event(defines.events.on_tick, function(event)
 end)
 
 script.on_event(defines.events.on_gui_click, on_gui_click)
+script.on_event(defines.events.on_gui_opened , function(event)
+	if event.entity~=nil then
+		if nil==event.entity.last_user then
+			event.entity.last_user=game.get_player(event.player_index)
+		end
+		new_entity(event.entity)
+	end
+end)
 script.on_event(defines.events.on_gui_selection_state_changed, on_sel_change)
 script.on_event(defines.events.on_entity_died, on_entity_died)
-script.on_event(defines.events.on_entity_destroyed, on_entity_destroyed)
 script.on_event(defines.events.on_player_mined_entity, on_player_mined_entity)
 
 script.on_event(defines.events.on_robot_built_entity, function(event)
