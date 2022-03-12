@@ -3,6 +3,7 @@
 * If you play sandbox mode, please create character first or it will lead script error. Open console, execute "/c game.player.create_character()"
 * If you find a bug feel free commit issue with details
 * Do not support Multiplayer, never tested.
+* In Wave Defense the system give you some turret and a rocket-silo at first, these can not be recognized by mod, you need click them open the GUI such the mod can get the event notify.
 * Do not support previous save because game don't give a API to read all entities. The script only can get notify event by player building or robot building. If you load a previous save, game will run but the mod will not able to recognize all entities you built, you need rebuild them.
 * May not work with some Mod.
 

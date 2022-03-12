@@ -3,7 +3,7 @@ local entitiesidx={}
 local reslist
 local gui={}
 local playerindex
-local furnace_type
+local furnace_type_index=1
 
 local BUCKET=10
 local lastaddentityindex={}
@@ -627,19 +627,22 @@ function harvest_feed(bucket)
 end
 
 local ft_option={"none","iron","copper","steel","stone-brick"}
-local ft_map={
+local ft_src={
+	["none"]="",
 	["iron"]="iron-ore",
 	["copper"]="copper-ore",
-	["stone-brick"]="stone",
 	["steel"]="iron-plate",
+	["stone-brick"]="stone",
 }
+
+function ft_source()
+	return ft_src[ft_option[furnace_type_index]]
+end
+
 function on_sel_change(event)
 	if "gui_ft_setting"==event.element.name then
-		furnace_type=ft_option[event.element.selected_index]
-		furnace_type=ft_map[furnace_type]
-		if nil~=furnace_type then
-			game.get_player(event.player_index).gui.top["furnace_type"].caption="FT="..furnace_type
-		end
+		furnace_type_index=event.element.selected_index
+		game.get_player(event.player_index).gui.top["furnace_type"].caption="FT="..ft_source()
 	end
 end
 
@@ -651,7 +654,7 @@ function on_gui_click(event)
 	if "furnace_type"==event.element.name then
 		if nil ==gui[event.player_index].ft then
 			gui[event.player_index].ft=game.get_player(event.player_index).gui.center.add{type="frame"}
-			gui[event.player_index].ft.add{type="drop-down",items=ft_option,selected_index=1,name="gui_ft_setting"}
+			gui[event.player_index].ft.add{type="drop-down",items=ft_option,selected_index=furnace_type_index,name="gui_ft_setting"}
 		else
 			gui[event.player_index].ft.destroy()
 			gui[event.player_index].ft=nil
@@ -750,7 +753,8 @@ function new_entity(entity)
 	entitieslist[player][lastaddentityindex[player]][entity.unit_number]={entity=entity}
 	local e=entitieslist[player][lastaddentityindex[player]][entity.unit_number]
 	if entitiesidx[entity.unit_number]~=nil then
-		game.print("ERROR this index is used "..player.." "..entity.unit_number)
+		--game.print("ERROR this index is used "..player.." "..entity.unit_number)
+		return
 	end
 	entitiesidx[entity.unit_number]={
 		playerid=player,
@@ -760,9 +764,10 @@ function new_entity(entity)
 	if lastaddentityindex[player]>BUCKET then
 		lastaddentityindex[player]=1
 	end
-
-	if is_furnace(entity) and nil~= furnace_type then
-		e.furnace_source=furnace_type
+	
+	local ftsrc=ft_source()
+	if is_furnace(entity) and #ftsrc>1 then
+		e.furnace_source=ftsrc
 	end
 end
 

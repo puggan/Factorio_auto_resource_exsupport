@@ -1,6 +1,6 @@
 {
 	"name": "auto-resource",
-	"version": "0.0.5",
+	"version": "0.0.6",
 	"title": "Auto Resource",
 	"author": "asd",
 	"dependencies": ["base >= 1.1.0"],
