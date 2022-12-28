@@ -16,18 +16,6 @@ Kchest["storage-tank"]=true
 Kchest["pumpjack"]=true
 
 local Kmachine={
-	["assembling-machine-1"]=true,
-	["assembling-machine-2"]=true,
-	["assembling-machine-3"]=true,
-	["stone-furnace"]=true,
-	["steel-furnace"]=true,
-	["electric-furnace"]=true,
-	["oil-refinery"]=true,
-	["chemical-plant"]=true,
-	["stone-furnace"]=true,
-	["steel-furnace"]=true,
-	["electric-furnace"]=true,
-	["rocket-silo"]=true,
 }
 
 local _fuel={"coal","solid-fuel"}
@@ -51,15 +39,6 @@ function is_lab(entity)
 end
 
 local Kfluid={
-	["crude-oil"]=1,
-	["fluid-unknown"]=1,
-	["heavy-oil"]=1,
-	["light-oil"]=1,
-	["lubricant"]=1,
-	["petroleum-gas"]=1,
-	["steam"]=1,
-	["sulfuric-acid"]=1,
-	["water"]=1,
 }
 
 function is_fluid(name)
@@ -102,74 +81,27 @@ local Ksp={
 
 function init()
 	local store1M={
-		"iron-ore",
-		"copper-ore",
-		"uranium-ore",
-		"stone",
-		"coal",
-		"water",
 		}
 	local store1K={
-		"iron-plate",
-		"copper-plate",
-		"steel-plate",
-		"stone-brick",
 		}
 	
 	local store25K={
-		"crude-oil",
-		"heavy-oil",
-		"light-oil",
-		"lubricant",
-		"petroleum-gas",
-		"sulfuric-acid",
 		}
 	local store200={
-		"transport-belt",
-		"pipe",
-		"inserter",
-		"copper-cable",
-		"iron-gear-wheel",
-		"electronic-circuit",
-		"stone-wall",
-		"firearm-magazine",
-		"piercing-rounds-magazine",
-		"grenade",
-		"plastic-bar",
-		"sulfur",
-		"advanced-circuit",
-		"engine-unit",
-		"iron-stick",
-		"rail",
-		"electric-furnace",
-		"productivity-module",
-		
-		"processing-unit",
-		"battery",
-		"electric-engine-unit",
-		"flying-robot-frame",
-		
-		"speed-module",
-		
-		"rocket-control-unit",
-		"low-density-structure",
-		"rocket-fuel",
-		"solid-fuel",
-		"automation-science-pack",
-		"logistic-science-pack",
-		"military-science-pack",
-		"chemical-science-pack",
-		"production-science-pack",
-		"utility-science-pack",
-		"space-science-pack",
-		"solar-panel",
-		"accumulator",
-		"radar",
-		"explosives",
-		"explosive-cannon-shell",
-		"artillery-shell",
 		}
-	
+local list = {}
+for _, item in pairs(game.item_prototypes) do 
+    list[#list+1] = item.name
+end
+store200 = list
+local list1 = {}
+for _, fluid in pairs(game.fluid_prototypes) do
+	Kfluid[fluid.name] = 1
+	store25K[#store25K+1] = fluid.name
+end
+for _, entity in pairs(game.get_filtered_entity_prototypes({{filter = "crafting-machine"}})) do
+	Kmachine[entity.name] = true
+end
 	entitieslist={}
 	reslist={}
 	for i=1,7 do
@@ -192,7 +124,7 @@ function init()
 		f(store1M,1000000)
 		f(store1K,1000)
 		f(store25K,25000)
-		f(store200,200)
+		f(store200,2000)
 		global.ar={
 			entitieslist=entitieslist,
 			reslist=reslist,
