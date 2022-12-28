@@ -1,3 +1,6 @@
+This is a hacked version of the mod that will automatically add every fluid, item, and machine to their respective lists, all items are now set to default to storing 2k, fluids 25k, this does not support modded fuels, ammo, or turrets, sorry but you can still manually add them, downside is a quarter of your screen is taken up by items, i will add a button to toggle the big item display later
+
+
 # Introduction
 * Collect and distribute resources(including ammo) automatically, just like playing RTS game! 
 * If you play sandbox mode, please create character first or it will lead script error. Open console, execute "/c game.player.create_character()"
