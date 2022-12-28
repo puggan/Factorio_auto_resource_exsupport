@@ -37,14 +37,6 @@ end
 function is_lab(entity)
 	return "lab"==entity.prototype.name
 end
-
-local Kfluid={
-}
-
-function is_fluid(name)
-	return Kfluid[name]~=nil
-end
-
 local Kfurnace={
 	["stone-furnace"]=true,
 	["steel-furnace"]=true,
@@ -52,6 +44,15 @@ local Kfurnace={
 }
 function is_furnace(entity)
 	return Kfurnace[entity.prototype.name]~=nil
+end
+list1 = {}
+
+is_fluid = function(name)
+	--if name == "water" then
+	--	game.print(name)
+	--	game.print(game.fluid_prototypes[name] ~= nil)
+	--end
+	return game.fluid_prototypes[name] ~= nil
 end
 
 function is_machine(entity)
@@ -79,26 +80,27 @@ local Ksp={
 	"space-science-pack",
 }
 
+
 function init()
 	local store1M={
 		}
 	local store1K={
 		}
-	
-	local store25K={
-		}
 	local store200={
 		}
+--fuck fluids
+local store25K={
+}
+for _, fluid in pairs(game.fluid_prototypes) do
+	addToFluid(fluid.name)
+	store25K[#store25K+1] = fluid.name
+end
+
 local list = {}
 for _, item in pairs(game.item_prototypes) do 
     list[#list+1] = item.name
 end
 store200 = list
-local list1 = {}
-for _, fluid in pairs(game.fluid_prototypes) do
-	Kfluid[fluid.name] = 1
-	store25K[#store25K+1] = fluid.name
-end
 for _, entity in pairs(game.get_filtered_entity_prototypes({{filter = "crafting-machine"}})) do
 	Kmachine[entity.name] = true
 end
