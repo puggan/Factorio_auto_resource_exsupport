@@ -4,6 +4,14 @@ local reslist
 local gui={}
 local playerindex
 local furnace_type_index=1
+script.on_event("autoresourceex-hide-restable", function(event)
+	localplayer = game.players[event.player_index]
+	if localplayer.gui.top.restable.visible == true then
+		localplayer.gui.top.restable.visible = false
+	else
+		localplayer.gui.top.restable.visible = true
+	end
+  end)
 
 local BUCKET=10
 local lastaddentityindex={}
