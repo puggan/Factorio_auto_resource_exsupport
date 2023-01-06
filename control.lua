@@ -13,6 +13,11 @@ script.on_event("autoresourceex-hide-restable", function(event)
 	end
   end)
 
+  script.on_event("autoresourceex-run-onchange", function(event)
+onchange()
+  end)
+
+
 local BUCKET=10
 local lastaddentityindex={}
 local Kchest={}
@@ -162,6 +167,7 @@ function read_save()
     reslist=global.ar.reslist
 	entitiesidx=global.ar.entitiesidx
 	lastaddentityindex=global.ar.lastaddentityindex
+	onchangeyet = true
 end
 
 function entity_size_str(player)
@@ -648,10 +654,10 @@ function on_gui_click(event)
 end
 
 function create_gui(root,index)
-	local btn=root.add{type="button",caption="FT",name="furnace_type"}
 	gui[index]={}
 	gui[index].restable=root.add{type="table",column_count=28,name="restable"}
 	gui[index].entityinfo=root.add{type="label",caption="",name="entityinfo"}
+	local btn=root.add{type="button",caption="FT",name="furnace_type"}
 	for k1,v1 in pairs(reslist[index]) do
 		local str
 		if is_fluid(k1) then
@@ -659,7 +665,7 @@ function create_gui(root,index)
 		else
 			str="item/"..k1
 		end
-		gui[index].restable.add{type="sprite-button",sprite=str,name=k1,}
+		gui[index].restable.add{type="sprite-button",sprite=str,name=k1,visible=shouldvisible}
 	end
 
 end
@@ -689,6 +695,11 @@ function show()
 				g.tooltip=g.tooltip..". Click to get.[Left=1 Right=5 Shift+L=Stack Shift+R=Half stack]"
 			end
 			g.number=v1.count
+			if reslist[1][k1].count==0 and settings.global["show-resources-with-0"].value == false then
+				g.visible=false
+			else
+				g.visible=true
+			end
 		end
 		
 		gui[v.index].entityinfo.caption=f()
@@ -775,7 +786,10 @@ script.on_event(defines.events.on_tick, function(event)
 			_bucket=1
 		end
 	end
-	
+	if onchangeyet then
+		onchange()
+		onchangeyet = false
+	end
 	if 0 == (event.tick%(12)) then
 		show()
 	end
