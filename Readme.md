@@ -1,5 +1,7 @@
 This is a hacked version of the mod that will automatically add every fluid, item, and machine to their respective lists, all items are now set to default to storing 2k, fluids 25k, this does not support modded fuels, ammo, or turrets, sorry but you can still manually add them, downside is a quarter of your screen is taken up by items, you can press H to hide it btw, and it now by default only show items you have any of, you can toggle this in settings tho
 
+Most of what is written below is the old description with some tweaks, some information in it may be inaccurate or outdated
+
 
 # Introduction
 * Collect and distribute resources(including ammo) automatically, just like playing RTS game! 
