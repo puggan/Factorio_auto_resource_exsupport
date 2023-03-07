@@ -1,21 +1,3 @@
-This is a hacked version of the mod that will automatically add every fluid, item, and machine to their respective lists, all items are now set to default to storing 2k, fluids 25k, this does not support modded fuels, ammo, or turrets, sorry but you can still manually add them, downside is a quarter of your screen is taken up by items, you can press H to hide it btw, and it now by default only show items you have any of, you can toggle this in settings tho
-
-
-# Future features todo list
-* Multiplayer (not gonna happen any time soon)
-* Unified inventory for forces instead of per player
-* Insert export items based on force instead of the broken system in place
-* Inventory is seperated across surfaces (toggleable)
-* Modded labs / science
-* Modded turrets / ammo
-* Modded fuel / burner machines
-* Modded furnaces and modded furnace recipes in the furnace type gui
-* Add fuel and ammo to vehicles
-* More customizability
-
-Most of what is written below is the old description with some tweaks, some information in it may be inaccurate or outdated
-
-
 # Introduction
 * Collect and distribute resources(including ammo) automatically, just like playing RTS game! 
 * If you play sandbox mode, please create character first or it will lead script error. Open console, execute "/c game.player.create_character()"

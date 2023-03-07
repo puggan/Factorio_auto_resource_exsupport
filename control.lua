@@ -1,3 +1,6 @@
+nofirstrun = true
+onchangeyet = true
+pause = true
 local entitieslist
 local entitiesidx={}
 local reslist
@@ -42,7 +45,8 @@ local Kmachine={
 
 
 
-local _fuel={"coal","solid-fuel"}
+local _fuel={}
+local initfuel={"coal", "solid-fuel"}
 local _fuel_list={
 	["gun-turret"]={{"piercing-rounds-magazine","firearm-magazine"}},
 	["artillery-turret"]={{"artillery-shell"}},
@@ -53,7 +57,7 @@ local _fuel_list={
 	["steel-furnace"]={_fuel},
 	["heat-exchanger"]={{"water"}},
 }
-
+_fuel_list.__index = _fuel_list.prototype
 function need_fuel(entity)
 	return _fuel_list[entity.prototype.name]~=nil
 end
@@ -105,6 +109,9 @@ function init()
 	local list = {}
 	for _, item in pairs(game.item_prototypes) do 
 	list[#list+1] = item.name
+	if item.fuel_category == "chemical" then
+		_fuel[#_fuel+1] = item.name
+	end
 	end
 	store200 = list
 	local list1 = {}
@@ -112,6 +119,10 @@ function init()
 	store25K[#store25K+1] = fluid.name
 	end
 	for _, entity in pairs(game.get_filtered_entity_prototypes({{filter = "crafting-machine"}})) do
+		if entity.burner_prototype ~= nil and _fuel_list[entity.name] == nil and entity.burner_prototype.fuel_categories["chemical"] then
+			game.print(entity.name)
+			_fuel_list[entity.name] = {initfuel}
+		end
 	Kmachine[entity.name] = true
 	end
 
@@ -136,8 +147,8 @@ function init()
 		
 		f(store1M,1000000)
 		f(store1K,1000)
-		f(store25K,25000)
-		f(store200,2000)
+		f(store25K,settings.startup["max-liquid"].value)
+		f(store200,settings.startup["max-item"].value)
 		global.ar={
 			entitieslist=entitieslist,
 			reslist=reslist,
@@ -147,27 +158,46 @@ function init()
 	end
 end
 
-function onchange()
-	local list = {}
-	for _, item in pairs(game.item_prototypes) do 
-	list[#list+1] = item.name
-	end
-	store200 = list
-	local list1 = {}
-	for _, fluid in pairs(game.fluid_prototypes) do
-	store25K[#store25K+1] = fluid.name
-	end
-	for _, entity in pairs(game.get_filtered_entity_prototypes({{filter = "crafting-machine"}})) do
-	Kmachine[entity.name] = true
-	end
-end
-
 function read_save()	
 	entitieslist=global.ar.entitieslist
     reslist=global.ar.reslist
 	entitiesidx=global.ar.entitiesidx
 	lastaddentityindex=global.ar.lastaddentityindex
 	onchangeyet = true
+	nofirstrun = true
+	local f=function(items, n)
+		for k,v in ipairs(items) do
+				reslist[i][v].max=n
+		end
+	end
+	f(store25K,settings.startup["max-liquid"].value)
+	f(store200,settings.startup["max-item"].value)
+end
+
+
+function onchange()
+	local list = {}
+	for _, item in pairs(game.item_prototypes) do 
+		list[#list+1] = item.name
+		if item.fuel_category == "chemical" then
+			_fuel[#_fuel+1] = item.name
+			game.print(item.name)
+		end
+			reslist[1][item.name].max=settings.startup["max-item"].value
+	end
+	store200 = list
+	local list1 = {}
+	for _, fluid in pairs(game.fluid_prototypes) do
+		store25K[#store25K+1] = fluid.name
+		reslist[1][fluid.name].max=settings.startup["max-liquid"].value
+	end
+	for _, entity in pairs(game.get_filtered_entity_prototypes({{filter = "crafting-machine"}})) do
+		if entity.burner_prototype ~= nil and _fuel_list[entity.name] == nil and entity.burner_prototype.fuel_categories["chemical"] then
+			game.print(entity.name)
+			_fuel_list[entity.name] = {initfuel}
+		end
+		Kmachine[entity.name] = true
+	end
 end
 
 function entity_size_str(player)
@@ -406,7 +436,7 @@ function do_chest(player,entity)
 	return true
 end
 
-local MAX_FUEL=3
+local MAX_FUEL=1
 function do_fuel(player,entity)
 	if not need_fuel(entity) then
 		return
@@ -415,19 +445,26 @@ function do_fuel(player,entity)
 	local inv=entity.get_inventory(defines.inventory.fuel)
 
 	for k1,v1 in pairs(_fuel_list[entity.prototype.name]) do
+		--game.print(v1)
 		for k2,v2 in ipairs(v1) do
 			local n=MAX_FUEL
+			--game.print(v2)
 			if "water"==v2 then
 				n=9999
 			end
 			
 			local n1=read_entity(entity,v2)
-			if n1> n then
-				try_get_from_entity(player,entity,v2,n1-n,inv)
+			if entity.burner.currently_burning ~= nil and read_entity(entity,entity.burner.currently_burning.name) > n then
+				try_get_from_entity(player,entity,entity.burner.currently_burning.name,n1-n,inv)
 			end
-			
-			if n1<n then
-				try_put_to_entity(player,entity,v2, n, inv)
+			--burner doesnt look like a real word anymore, this code is so unreadable but its finished so no touchy unless you want to have a bad time, all it does is take burnt fuel output out of machines
+			if entity.get_inventory(defines.inventory.burnt_result) ~= nil and entity.burner.currently_burning ~= nil and entity.burner.currently_burning.burnt_result ~= nil then
+				numberburnt = entity.get_inventory(defines.inventory.burnt_result).get_item_count(entity.burner.currently_burning.burnt_result.name)
+				try_get_from_entity(player, entity, entity.burner.currently_burning.burnt_result.name, numberburnt, entity.get_inventory(defines.inventory.burnt_result))
+				--game.print(entity.burner.currently_burning.burnt_result.name)
+			end
+			if read_entity(entity,settings.global["preferred-fuel"].value)<n then
+				try_put_to_entity(player,entity,settings.global["preferred-fuel"].value, n, inv)
 			end
 		end
 	end
@@ -692,7 +729,7 @@ function show()
 			local g=gui[v.index].restable[k1]
 			g.tooltip=v1.count
 			if not is_fluid(k1) then
-				g.tooltip=g.tooltip..". Click to get.[Left=1 Right=5 Shift+L=Stack Shift+R=Half stack]"
+				g.tooltip=g.tooltip..k1..". Click to get.[Left=1 Right=5 Shift+L=Stack Shift+R=Half stack]"
 			end
 			g.number=v1.count
 			if reslist[1][k1].count==0 and settings.global["show-resources-with-0"].value == false then
@@ -791,7 +828,11 @@ script.on_event(defines.events.on_tick, function(event)
 		onchangeyet = false
 	end
 	if 0 == (event.tick%(12)) then
+		--preffuel = settings.global["preferred-fuel"].value
+		--_fuel = {preffuel, preffuel}
+		if pause then
 		show()
+		end
 	end
 end)
 

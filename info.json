@@ -1,9 +1,9 @@
 {
 	"name": "auto-resource-hacked",
-	"version": "0.0.10",
+	"version": "0.1.0",
 	"title": "Auto Resource Extra Support",
 	"author": "TheCrazyInsanity",
-	"dependencies": ["base >= 1.1.0"],
+	"dependencies": ["base >= 1.1.74"],
 	"description": "This mod collects and distributes all resources automatically, just like playing a classic RTS game. Don't need tons of belt/inserter/pipe anymore :), auto resource hacked to add extra support for mods",
 	"factorio_version": "1.1"
 }
