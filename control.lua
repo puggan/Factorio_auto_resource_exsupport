@@ -467,6 +467,8 @@ function do_fuel(player,entity)
 				if read_entity(entity,settings.global["preferred-fuel"].value)<n then
 					try_put_to_entity(player,entity,settings.global["preferred-fuel"].value, n, inv)
 				end
+			else
+				try_put_to_entity(player, entity, v2, n - n1, inv)
 			end
 		end
 	end
