@@ -454,17 +454,19 @@ function do_fuel(player,entity)
 			end
 			
 			local n1=read_entity(entity,v2)
-			if entity.burner.currently_burning ~= nil and read_entity(entity,entity.burner.currently_burning.name) > n then
-				try_get_from_entity(player,entity,entity.burner.currently_burning.name,n1-n,inv)
-			end
-			--burner doesnt look like a real word anymore, this code is so unreadable but its finished so no touchy unless you want to have a bad time, all it does is take burnt fuel output out of machines
-			if entity.get_inventory(defines.inventory.burnt_result) ~= nil and entity.burner.currently_burning ~= nil and entity.burner.currently_burning.burnt_result ~= nil then
-				numberburnt = entity.get_inventory(defines.inventory.burnt_result).get_item_count(entity.burner.currently_burning.burnt_result.name)
-				try_get_from_entity(player, entity, entity.burner.currently_burning.burnt_result.name, numberburnt, entity.get_inventory(defines.inventory.burnt_result))
-				--game.print(entity.burner.currently_burning.burnt_result.name)
-			end
-			if read_entity(entity,settings.global["preferred-fuel"].value)<n then
-				try_put_to_entity(player,entity,settings.global["preferred-fuel"].value, n, inv)
+			if entity.burner ~= nil then
+				if entity.burner.currently_burning ~= nil and read_entity(entity,entity.burner.currently_burning.name) > n then
+					try_get_from_entity(player,entity,entity.burner.currently_burning.name,n1-n,inv)
+				end
+				--burner doesnt look like a real word anymore, this code is so unreadable but its finished so no touchy unless you want to have a bad time, all it does is take burnt fuel output out of machines
+				if entity.get_inventory(defines.inventory.burnt_result) ~= nil and entity.burner.currently_burning ~= nil and entity.burner.currently_burning.burnt_result ~= nil then
+					numberburnt = entity.get_inventory(defines.inventory.burnt_result).get_item_count(entity.burner.currently_burning.burnt_result.name)
+					try_get_from_entity(player, entity, entity.burner.currently_burning.burnt_result.name, numberburnt, entity.get_inventory(defines.inventory.burnt_result))
+					--game.print(entity.burner.currently_burning.burnt_result.name)
+				end
+				if read_entity(entity,settings.global["preferred-fuel"].value)<n then
+					try_put_to_entity(player,entity,settings.global["preferred-fuel"].value, n, inv)
+				end
 			end
 		end
 	end
