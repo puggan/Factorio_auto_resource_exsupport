@@ -1,28 +1,19 @@
 nofirstrun = true
 onchangeyet = true
 pause = true
+
+local MAX_FUEL=1
+local BUCKET=10
+local _bucket=1
+
+local lastaddentityindex={}
 local entitieslist
 local entitiesidx={}
 local reslist
 local gui={}
 local playerindex
 local furnace_type_index=1
-script.on_event("autoresourceex-hide-restable", function(event)
-	localplayer = game.players[event.player_index]
-	if localplayer.gui.top.restable.visible == true then
-		localplayer.gui.top.restable.visible = false
-	else
-		localplayer.gui.top.restable.visible = true
-	end
-  end)
 
-  script.on_event("autoresourceex-run-onchange", function(event)
-onchange()
-  end)
-
-
-local BUCKET=10
-local lastaddentityindex={}
 local Kchest={}
 Kchest["wooden-chest"]=true
 Kchest["iron-chest"]=true
@@ -30,20 +21,36 @@ Kchest["steel-chest"]=true
 Kchest["storage-tank"]=true
 Kchest["pumpjack"]=true
 
+local Kmachine={
+}
+
+local Kfurnace={
+	["stone-furnace"]=true,
+	["steel-furnace"]=true,
+	["electric-furnace"]=true,
+}
+
 local store1M={
 }
+
 local store1K={
 }
 
 local store25K={
 }
+
 local store200={
 }
 
-local Kmachine={
+local Ksp={
+	"automation-science-pack",
+	"logistic-science-pack",
+	"military-science-pack",
+	"chemical-science-pack",
+	"production-science-pack",
+	"utility-science-pack",
+	"space-science-pack",
 }
-
-
 
 local _fuel={}
 local initfuel={"coal", "solid-fuel"}
@@ -58,6 +65,16 @@ local _fuel_list={
 	["heat-exchanger"]={{"water"}},
 }
 _fuel_list.__index = _fuel_list.prototype
+
+local ft_option={"none","iron","copper","steel","stone-brick"}
+local ft_src={
+	["none"]="",
+	["iron"]="iron-ore",
+	["copper"]="copper-ore",
+	["steel"]="iron-plate",
+	["stone-brick"]="stone",
+}
+
 function need_fuel(entity)
 	return _fuel_list[entity.prototype.name]~=nil
 end
@@ -66,16 +83,10 @@ function is_lab(entity)
 	return "lab"==entity.prototype.name
 end
 
-
 function is_fluid(name)
 	return game.fluid_prototypes[name] ~= nil
 end
 
-local Kfurnace={
-	["stone-furnace"]=true,
-	["steel-furnace"]=true,
-	["electric-furnace"]=true,
-}
 function is_furnace(entity)
 	return Kfurnace[entity.prototype.name]~=nil
 end
@@ -94,16 +105,6 @@ function is_accepted_type(entity)
 		or need_fuel(entity)
 		or is_lab(entity)
 end
-
-local Ksp={
-	"automation-science-pack",
-	"logistic-science-pack",
-	"military-science-pack",
-	"chemical-science-pack",
-	"production-science-pack",
-	"utility-science-pack",
-	"space-science-pack",
-}
 
 function init()
 	local list = {}
@@ -173,7 +174,6 @@ function read_save()
 	f(store25K,settings.startup["max-liquid"].value)
 	f(store200,settings.startup["max-item"].value)
 end
-
 
 function onchange()
 	local list = {}
@@ -436,7 +436,6 @@ function do_chest(player,entity)
 	return true
 end
 
-local MAX_FUEL=1
 function do_fuel(player,entity)
 	if not need_fuel(entity) then
 		return
@@ -624,15 +623,6 @@ function harvest_feed(bucket)
 	end	
 end
 
-local ft_option={"none","iron","copper","steel","stone-brick"}
-local ft_src={
-	["none"]="",
-	["iron"]="iron-ore",
-	["copper"]="copper-ore",
-	["steel"]="iron-plate",
-	["stone-brick"]="stone",
-}
-
 function ft_source()
 	return ft_src[ft_option[furnace_type_index]]
 end
@@ -811,10 +801,23 @@ function on_player_mined_entity (event)
 	remove_entity(event.entity)
 end
 
+script.on_event("autoresourceex-hide-restable", function(event)
+	localplayer = game.players[event.player_index]
+	if localplayer.gui.top.restable.visible == true then
+		localplayer.gui.top.restable.visible = false
+	else
+		localplayer.gui.top.restable.visible = true
+	end
+  end)
+
+script.on_event("autoresourceex-run-onchange", function(event)
+onchange()
+  end)
+
 script.on_event(defines.events.on_built_entity, on_built_entity)
+
 script.on_event(defines.events.on_entity_cloned, on_entity_cloned)
 
-local _bucket=1
 script.on_event(defines.events.on_tick, function(event)
 	if 0 == (event.tick%(5)) then	
 		harvest_feed(_bucket)
@@ -837,6 +840,7 @@ script.on_event(defines.events.on_tick, function(event)
 end)
 
 script.on_event(defines.events.on_gui_click, on_gui_click)
+
 script.on_event(defines.events.on_gui_opened , function(event)
 	if event.entity~=nil then
 		if nil==event.entity.last_user then
@@ -845,8 +849,11 @@ script.on_event(defines.events.on_gui_opened , function(event)
 		new_entity(event.entity)
 	end
 end)
+
 script.on_event(defines.events.on_gui_selection_state_changed, on_sel_change)
+
 script.on_event(defines.events.on_entity_died, on_entity_died)
+
 script.on_event(defines.events.on_player_mined_entity, on_player_mined_entity)
 
 script.on_event(defines.events.on_robot_built_entity, function(event)
@@ -868,6 +875,9 @@ script.on_event(defines.events.on_robot_mined_entity, function(event)
 	--game.print("robot mine entity "..event.entity.prototype.name)
 	remove_entity(event.entity)
 end)
+
 script.on_configuration_changed(onchange)
+
 script.on_load(read_save)
+
 script.on_init(init)
