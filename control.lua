@@ -75,7 +75,7 @@ function need_fuel(entity)
 end
 
 function is_lab(entity)
-    return "lab" == entity.prototype.name
+    return entity.prototype.name == "lab"
 end
 
 function is_fluid(name)
@@ -338,7 +338,7 @@ end
 
 function read_output(player, entity)
     local outputinventory = entity.get_output_inventory()
-    if nil ~= outputinventory then
+    if outputinventory ~= nil then
         -- k = prototype name v = number
         for k,v in pairs(outputinventory.get_contents()) do
             game.print("found "..k.." "..v)
@@ -424,7 +424,7 @@ function do_chest(player, entity)
         return false
     end
     local inv = entity.get_output_inventory()
-    if nil ~= inv then
+    if inv ~= nil then
         -- k = prototype name v = number
         for k,v in pairs(inv.get_contents()) do
             try_get_from_entity(player, entity, k, v, inv)
@@ -452,7 +452,7 @@ function do_fuel(player, entity)
         for k2,v2 in ipairs(v1) do
             local n = MAX_FUEL
             -- game.print(v2)
-            if "water" == v2 then
+            if v2 == "water" then
                 n = 9999
             end
 
@@ -503,7 +503,7 @@ function do_output(player, entity)
 end
 
 function do_ssp(player, entity)
-    if "rocket-silo" == entity.prototype.name then
+    if entity.prototype.name == "rocket-silo" then
         try_get_from_entity(player, entity, "space-science-pack", 1000, entity.get_output_inventory())
     end
 end
@@ -631,7 +631,7 @@ function ft_source()
 end
 
 function on_sel_change(event)
-    if "gui_ft_setting" == event.element.name then
+    if event.element.name == "gui_ft_setting" then
         furnace_type_index = event.element.selected_index
         game.get_player(event.player_index).gui.top["furnace_type"].caption = "FT="..ft_source()
     end
@@ -642,8 +642,8 @@ function on_gui_click(event)
         return
     end
 
-    if "furnace_type" == event.element.name then
-        if nil == gui[event.player_index].ft then
+    if event.element.name == "furnace_type" then
+        if gui[event.player_index].ft == nil then
             gui[event.player_index].ft = game.get_player(event.player_index).gui.center.add{ type = "frame" }
             gui[event.player_index].ft.add{ type = "drop-down", items = ft_option, selected_index = furnace_type_index, name = "gui_ft_setting" }
         else
@@ -658,7 +658,7 @@ function on_gui_click(event)
     if defines.mouse_button_type.left == event.button then
         if event.shift then
             local p = game.item_prototypes[event.element.name]
-            if nil == p or nil == p.stack_size then
+            if p == nil or p.stack_size == nil then
                 game.print(event.element.name.." is nil")
             else
                 n = game.item_prototypes[event.element.name].stack_size
@@ -708,11 +708,11 @@ function show()
 
         local res = reslist[v.index]
 
-        if nil == v.gui.top["furnace_type"] then
+        if v.gui.top["furnace_type"] == nil then
             create_gui(v.gui.top, v.index)
         end
 
-        if nil == gui[v.index] then
+        if gui[v.index] == nil then
             gui[v.index] = {}
             gui[v.index].restable = v.gui.top["restable"]
             gui[v.index].entityinfo = v.gui.top["entityinfo"]
@@ -741,7 +741,7 @@ function new_entity(entity)
        return
     end
 
-    if nil == entity.last_user then
+    if entity.last_user == nil then
         game.print(entity.prototype.name.." has no last_user")
         return
     end
@@ -783,7 +783,7 @@ function remove_entity(entity)
     end
 
     local p = entitiesidx[entity.unit_number]
-    if nil == p then
+    if p == nil then
         game.print("unknown entity "..entity.prototype.name)
         return
     end
@@ -824,7 +824,7 @@ script.on_event(defines.events.on_built_entity, on_built_entity)
 script.on_event(defines.events.on_entity_cloned, on_entity_cloned)
 
 script.on_event(defines.events.on_tick, function(event)
-    if 0 == (event.tick%(5)) then
+    if (event.tick%(5)) == 0 then
         harvest_feed(_bucket)
         _bucket = _bucket+1
         if _bucket > BUCKET then
@@ -835,7 +835,7 @@ script.on_event(defines.events.on_tick, function(event)
         onchange()
         onchangeyet = false
     end
-    if 0 == (event.tick%(12)) then
+    if (event.tick%(12)) == 0 then
         -- preffuel = settings.global["preferred-fuel"].value
         -- _fuel = {preffuel, preffuel}
         if pause then
@@ -848,7 +848,7 @@ script.on_event(defines.events.on_gui_click, on_gui_click)
 
 script.on_event(defines.events.on_gui_opened , function(event)
     if event.entity ~= nil then
-        if nil == event.entity.last_user then
+        if event.entity.last_user == nil then
             event.entity.last_user = game.get_player(event.player_index)
         end
         new_entity(event.entity)
