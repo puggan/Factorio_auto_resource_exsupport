@@ -119,7 +119,6 @@ function init()
         if entity.burner_prototype ~= nil and
                 _fuel_list[entity.name] == nil and
                 entity.burner_prototype.fuel_categories["chemical"] then
-            game.print(entity.name)
             _fuel_list[entity.name] = { initfuel }
         end
         Kmachine[entity.name] = true
@@ -179,7 +178,6 @@ function onchange()
         allItems[#allItems + 1] = item.name
         if item.fuel_category == "chemical" then
             _fuel[#_fuel + 1] = item.name
-            game.print(item.name)
         end
         for playerId = 1,7 do
             reslist[playerId][item.name].max = settings.global["max-item"].value
@@ -196,7 +194,6 @@ function onchange()
         if entity.burner_prototype ~= nil and
                 _fuel_list[entity.name] == nil and
                 entity.burner_prototype.fuel_categories["chemical"] then
-            game.print(entity.name)
             _fuel_list[entity.name] = { initfuel }
         end
         Kmachine[entity.name] = true
@@ -319,7 +316,6 @@ function print_recipe(entity)
 end
 
 function try_get_from_entity(playerId, entity, itemName, itemCount, inventory)
-    -- game.print(name .. " " .. n)
     local itemSpace = can_insert_res(playerId, itemName)
     if itemCount > itemSpace then
         itemCount = itemSpace
@@ -424,46 +420,44 @@ function do_fuel(playerId, entity)
         return false
     end
 
-    if not entity.burner ~= nil then
-        return false
-    end
-
-    local burntResultInventory = entity.get_inventory(defines.inventory.burnt_result)
-    if burntResultInventory ~= nil and
-            entity.burner.currently_burning ~= nil and
-            entity.burner.currently_burning.burnt_result ~= nil then
-        local burntResultName = entity.burner.currently_burning.burnt_result.name
-        try_get_from_entity(
-            playerId,
-            entity,
-            burntResultName,
-            burntResultInventory.get_item_count(burntResultName),
-            burntResultInventory
-        )
-    end
-
-    if entity.burner.currently_burning ~= nil then
-        local fuelName = entity.burner.currently_burning.name
-        local fuelCount = read_entity(entity, entity.burner.currently_burning.name)
-        local minAmount = settings.global["min-fuel"].value
-        local maxAmount = settings.global["max-fuel"].value
-        if fuelName == "water" then
-            minAmount = 9999
-            maxAmount = 9999
-        end
-
-        if fuelCount > maxAmount then
+    if entity.burner ~= nil then
+        local burntResultInventory = entity.get_inventory(defines.inventory.burnt_result)
+        if burntResultInventory ~= nil and
+                entity.burner.currently_burning ~= nil and
+                entity.burner.currently_burning.burnt_result ~= nil then
+            local burntResultName = entity.burner.currently_burning.burnt_result.name
             try_get_from_entity(
                 playerId,
                 entity,
-                fuelName,
-                fuelCount - maxAmount,
-                entity.get_inventory(defines.inventory.fuel)
+                burntResultName,
+                burntResultInventory.get_item_count(burntResultName),
+                burntResultInventory
             )
         end
 
-        if fuelCount >= minAmount then
-            return
+        if entity.burner.currently_burning ~= nil then
+            local fuelName = entity.burner.currently_burning.name
+            local fuelCount = read_entity(entity, entity.burner.currently_burning.name)
+            local minAmount = settings.global["min-fuel"].value
+            local maxAmount = settings.global["max-fuel"].value
+            if fuelName == "water" then
+                minAmount = 9999
+                maxAmount = 9999
+            end
+
+            if fuelCount > maxAmount then
+                try_get_from_entity(
+                    playerId,
+                    entity,
+                    fuelName,
+                    fuelCount - maxAmount,
+                    entity.get_inventory(defines.inventory.fuel)
+                )
+            end
+
+            if fuelCount >= minAmount then
+                return
+            end
         end
     end
 
@@ -565,6 +559,8 @@ function harvest_feed_entity(playerId, entityObj)
         return
     end
 
+    do_fuel(playerId, entityObj.entity)
+
     if do_furnace(playerId, entityObj) then
         return
     end
@@ -572,8 +568,6 @@ function harvest_feed_entity(playerId, entityObj)
     if do_ammo(playerId, entityObj.entity) then
         return
     end
-
-    do_fuel(playerId, entityObj.entity)
 
     if not is_machine(entityObj.entity) then
         return
@@ -859,22 +853,18 @@ script.on_event(defines.events.on_entity_died, on_entity_died)
 script.on_event(defines.events.on_player_mined_entity, on_player_mined_entity)
 
 script.on_event(defines.events.on_robot_built_entity, function(event)
-    -- game.print("robot build entity " .. event.created_entity.prototype.name)
     new_entity(event.created_entity)
 end)
 
 script.on_event(defines.events.on_entity_cloned, function(event)
-    -- game.print("clone entity " .. event.destination.prototype.name)
     new_entity(event.destination)
 end)
 
 script.on_event(defines.events.on_trigger_created_entity, function(event)
-    -- game.print("trigger create entity " .. event.entity.prototype.name)
     new_entity(event.entity)
 end)
 
 script.on_event(defines.events.on_robot_mined_entity, function(event)
-    -- game.print("robot mine entity " .. event.entity.prototype.name)
     remove_entity(event.entity)
 end)
 
