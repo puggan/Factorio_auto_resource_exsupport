@@ -63,4 +63,13 @@ data:extend({
         localised_name = "Maximum Liquid",
         localised_description = "Maximum amount of liquid to store of each type.",
     },
+    {
+        type = "int-setting",
+        name = "min-item",
+        setting_type = "runtime-global",
+        default_value = "10",
+        auto_trim = true,
+        localised_name = "Minimum items",
+        localised_description = "Minimum number of items to store of each type. Only auto-fill machines with items when we have more then this amount.",
+    },
 })

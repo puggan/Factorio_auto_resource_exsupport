@@ -341,7 +341,8 @@ function try_get_from_entity(playerId, entity, itemName, itemCount, inventory)
 end
 
 function try_put_to_entity(playerId, entity, itemName, itemCount, inventory)
-    local availableItems = read_res(playerId, itemName)
+    local availableItems = read_res(playerId, itemName) - settings.global["min-item"].value
+
     if itemCount > availableItems then
         itemCount = availableItems
     end
