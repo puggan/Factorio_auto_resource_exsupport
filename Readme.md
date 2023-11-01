@@ -38,4 +38,3 @@ The entity number will affect the efficiency but I tested it with about 10000 en
 * `min-item`, default 10, Minimum number of items to store of each type. Only auto-fill machines with items when we have more then this amount. This make sure you always have a few items available for handcrafting or placement.
 * `item-columns`, default 28, How many items to show on each row. Lower this if you have other mods that also want to use the top-space.
 * `ft-button`, default `true`, Show the Furnace-template configuration button. Turn off this to save space by hiding the button.
-})
