@@ -719,6 +719,9 @@ function show()
         end
 
         gui[player.index].entityinfo.caption = entityCaption()
+
+        player.gui.top["furnace_type"].visible = settings.global["ft-button"].value;
+        gui[player.index].entityinfo.visible = settings.global["ft-button"].value;
     end
 end
 
