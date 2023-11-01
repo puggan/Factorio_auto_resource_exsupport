@@ -2,8 +2,6 @@ nofirstrun = true
 onchangeyet = true
 pause = true
 
-local MAX_FUEL = 1
-local MAX_AMMO = 10
 local BUCKETS_COUNT = 10
 local current_bucket_index = 1
 
@@ -146,8 +144,8 @@ function init()
             end
         end
 
-        setMaxValues(storeLiquid, settings.startup["max-liquid"].value)
-        setMaxValues(storeNormalItems, settings.startup["max-item"].value)
+        setMaxValues(storeLiquid, settings.global["max-liquid"].value)
+        setMaxValues(storeNormalItems, settings.global["max-item"].value)
         global.ar = {
             entitieslist = entitieslist,
             reslist = reslist,
@@ -171,8 +169,8 @@ function read_save()
             end
         end
     end
-    setMaxValues(storeLiquid, settings.startup["max-liquid"].value)
-    setMaxValues(storeNormalItems, settings.startup["max-item"].value)
+    setMaxValues(storeLiquid, settings.global["max-liquid"].value)
+    setMaxValues(storeNormalItems, settings.global["max-item"].value)
 end
 
 function onchange()
@@ -184,14 +182,14 @@ function onchange()
             game.print(item.name)
         end
         for playerId = 1,7 do
-            reslist[playerId][item.name].max = settings.startup["max-item"].value
+            reslist[playerId][item.name].max = settings.global["max-item"].value
         end
     end
     storeNormalItems = allItems
     for _, fluid in pairs(game.fluid_prototypes) do
         storeLiquid[#storeLiquid + 1] = fluid.name
         for playerId = 1,7 do
-            reslist[playerId][fluid.name].max = settings.startup["max-liquid"].value
+            reslist[playerId][fluid.name].max = settings.global["max-liquid"].value
         end
     end
     for _, entity in pairs(game.get_filtered_entity_prototypes({ { filter = "crafting-machine" } })) do
@@ -396,13 +394,23 @@ function do_ammo(playerId, entity)
     end
 
     local inventory = entity.get_inventory(defines.inventory.fuel)
+    local preferredAmmo = settings.global["preferred-ammo"].value
+    local ammoCount = read_entity(entity, preferredAmmo)
+    if ammoCount < settings.global["min-ammo"].value then
+        local depositedAmmo = try_put_to_entity(playerId, entity, preferredAmmo, settings.global["min-ammo"].value - ammoCount, inventory)
+        if depositedAmmo > 0 then
+            return true
+        end
+    end
+
     for _,ammoSubList in pairs(_ammo_list[entity.prototype.name]) do
         for k2,ammoName in ipairs(ammoSubList) do
-            local preferedAmount = MAX_AMMO
-            local ammoCount = read_entity(entity, ammoName)
-            local depositedAmmo = try_put_to_entity(playerId, entity, ammoName, preferedAmount - ammoCount, inventory)
-            if depositedAmmo > 0 then
-                return true
+            ammoCount = read_entity(entity, ammoName)
+            if ammoCount < settings.global["min-ammo"].value then
+                local depositedAmmo = try_put_to_entity(playerId, entity, ammoName, settings.global["min-ammo"].value - ammoCount, inventory)
+                if depositedAmmo > 0 then
+                    return true
+                end
             end
         end
     end
@@ -436,22 +444,24 @@ function do_fuel(playerId, entity)
     if entity.burner.currently_burning ~= nil then
         local fuelName = entity.burner.currently_burning.name
         local fuelCount = read_entity(entity, entity.burner.currently_burning.name)
-        local preferedAmount = MAX_FUEL
+        local minAmount = settings.global["min-fuel"].value
+        local maxAmount = settings.global["max-fuel"].value
         if fuelName == "water" then
-            n = 9999
+            minAmount = 9999
+            maxAmount = 9999
         end
 
-        if fuelCount > preferedAmount then
+        if fuelCount > maxAmount then
             try_get_from_entity(
                 playerId,
                 entity,
                 fuelName,
-                fuelCount - preferedAmount,
+                fuelCount - maxAmount,
                 entity.get_inventory(defines.inventory.fuel)
             )
         end
 
-        if fuelCount >= preferedAmount then
+        if fuelCount >= minAmount then
             return
         end
     end
@@ -459,8 +469,8 @@ function do_fuel(playerId, entity)
     local inventory = entity.get_inventory(defines.inventory.fuel)
     local preferredFuel = settings.global["preferred-fuel"].value
     local preferredFuelCount = read_entity(entity, preferredFuel)
-    if preferredFuelCount < MAX_FUEL then
-        local depositedFuel = try_put_to_entity(playerId, entity, preferredFuel, MAX_FUEL - preferredFuelCount, inventory)
+    if preferredFuelCount < settings.global["min-fuel"].value then
+        local depositedFuel = try_put_to_entity(playerId, entity, preferredFuel, settings.global["min-fuel"].value - preferredFuelCount, inventory)
         if depositedFuel > 0 then
             return
         end
@@ -468,7 +478,7 @@ function do_fuel(playerId, entity)
 
     for _,fuelSubList in pairs(_fuel_list[entity.prototype.name]) do
         for _,fuelName in ipairs(fuelSubList) do
-            local preferedAmount = MAX_FUEL
+            local preferedAmount = settings.global["min-fuel"].value
             if fuelName == "water" then
                 preferedAmount = 9999
             end
@@ -678,7 +688,7 @@ function create_gui(root, index)
         if is_fluid(k1) then
             str = "fluid/" .. itemName
         end
-        gui[index].restable.add{ type = "sprite-button", sprite = str, name = itemName, visible = nil }
+        gui[index].restable.add{ type = "sprite-button", sprite = str, name = itemName, visible = false }
     end
 end
 
@@ -708,9 +718,7 @@ function show()
             if not is_fluid(itemName) then
                 resourceListIcon.tooltip = resourceListIcon.tooltip .. itemName .. ". Click to get.[Left=1 Right=5 Shift+L=Stack Shift+R=Half stack]"
             end
-            if itemStorage.count == 0 and settings.global["show-resources-with-0"].value == false then
-                resourceListIcon.visible = false
-            else
+            if itemStorage.count > 0 then
                 resourceListIcon.visible = true
             end
         end
