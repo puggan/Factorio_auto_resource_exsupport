@@ -73,12 +73,21 @@ data:extend({
         localised_description = "Minimum number of items to store of each type. Only auto-fill machines with items when we have more then this amount.",
     },
     {
+        type = "int-setting",
+        name = "item-columns",
+        setting_type = "runtime-global",
+        default_value = "28",
+        auto_trim = true,
+        localised_name = "Item columns",
+        localised_description = "How many items to show on each row.",
+    },
+    {
         type = "bool-setting",
         name = "ft-button",
         setting_type = "runtime-global",
         default_value = true,
         auto_trim = true,
         localised_name = "Show FT-button",
-        localised_description = "Show the Furnace-template configuration button",
+        localised_description = "Show the Furnace-template configuration button.",
     },
 })

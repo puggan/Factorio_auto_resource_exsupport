@@ -672,7 +672,7 @@ end
 
 function create_gui(root, index)
     gui[index] = {
-        restable = root.add{ type = "table", column_count = 28, name = "restable" },
+        restable = root.add{ type = "table", column_count = settings.global["item-columns"].value, name = "restable" },
         entityinfo = root.add{ type = "label", caption = "", name = "entityinfo" },
     }
 
