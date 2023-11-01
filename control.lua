@@ -676,11 +676,11 @@ function create_gui(root, index)
         entityinfo = root.add{ type = "label", caption = "", name = "entityinfo" },
     }
 
-    -- local btn = root.add{ type = "button", caption = "FT", name = "furnace_type" }
+    root.add{ type = "button", caption = "FT", name = "furnace_type" }
 
-    for itemName,v1 in pairs(reslist[index]) do
+    for itemName,_ in pairs(reslist[index]) do
         local str = "item/" .. itemName
-        if is_fluid(k1) then
+        if is_fluid(itemName) then
             str = "fluid/" .. itemName
         end
         gui[index].restable.add{ type = "sprite-button", sprite = str, name = itemName, visible = false }
@@ -720,8 +720,10 @@ function show()
 
         gui[player.index].entityinfo.caption = entityCaption()
 
-        player.gui.top["furnace_type"].visible = settings.global["ft-button"].value;
-        gui[player.index].entityinfo.visible = settings.global["ft-button"].value;
+        if player.gui.top["furnace_type"] ~= nil then
+            player.gui.top["furnace_type"].visible = settings.global["ft-button"].value;
+            gui[player.index].entityinfo.visible = settings.global["ft-button"].value;
+        end
     end
 end
 
