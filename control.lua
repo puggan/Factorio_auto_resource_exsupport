@@ -3,6 +3,7 @@ onchangeyet = true
 pause = true
 
 local MAX_FUEL = 1
+local MAX_AMMO = 10
 local BUCKETS_COUNT = 10
 local current_bucket_index = 1
 
@@ -46,8 +47,6 @@ local SiencePackNames = {
 local _fuel = {}
 local initfuel = { "coal", "solid-fuel" }
 local _fuel_list = {
-    ["gun-turret"] = { { "piercing-rounds-magazine", "firearm-magazine" } },
-    ["artillery-turret"] = { { "artillery-shell" } },
     ["flamethrower-turret"] = { { "light-oil", "heavy-oil", "crude-oil" } },
     ["boiler"] = { _fuel, { "water" } },
     ["burner-mining-drill"] = { _fuel },
@@ -56,6 +55,11 @@ local _fuel_list = {
     ["heat-exchanger"] = { { "water" } },
 }
 _fuel_list.__index = _fuel_list.prototype
+
+local _ammo_list = {
+    ["gun-turret"] = { { "piercing-rounds-magazine", "firearm-magazine" } },
+    ["artillery-turret"] = { { "artillery-shell" } },
+}
 
 local ft_option = { "none", "iron", "copper", "steel", "stone-brick" }
 local ft_src = {
@@ -68,6 +72,10 @@ local ft_src = {
 
 function need_fuel(entity)
     return _fuel_list[entity.prototype.name] ~= nil
+end
+
+function need_ammo(entity)
+    return _ammo_list[entity.prototype.name] ~= nil
 end
 
 function is_lab(entity)
@@ -382,6 +390,26 @@ function do_chest(playerId, entity)
     return true
 end
 
+function do_ammo(playerId, entity)
+    if not need_ammo(entity) then
+        return false
+    end
+
+    local inventory = entity.get_inventory(defines.inventory.fuel)
+    for _,ammoSubList in pairs(_ammo_list[entity.prototype.name]) do
+        for k2,ammoName in ipairs(ammoSubList) do
+            local preferedAmount = MAX_AMMO
+            local ammoCount = read_entity(entity, ammoName)
+            local depositedAmmo = try_put_to_entity(playerId, entity, ammoName, preferedAmount - ammoCount, inventory)
+            if depositedAmmo > 0 then
+                return true
+            end
+        end
+    end
+
+    return true
+end
+
 function do_fuel(playerId, entity)
     if not need_fuel(entity) then
         return false
@@ -527,6 +555,10 @@ function harvest_feed_entity(playerId, entityObj)
     end
 
     if do_furnace(playerId, entityObj) then
+        return
+    end
+
+    if do_ammo(playerId, entityObj.entity) then
         return
     end
 
