@@ -208,7 +208,7 @@ end
 function entity_size_str(player)
     local str = ""
     for _,v in ipairs(entitieslist[player]) do
-        str = str..table_size(v).." "
+        str = str .. table_size(v) .. " "
     end
     return str
 end
@@ -222,21 +222,21 @@ function print_inventory(entity)
         if inventory == nil then
             return ""
         end
-        local str = "slot "..#inventory
+        local str = "slot " .. #inventory
         for key,value in pairs(inventory.get_contents()) do
-            str = str.. " "..key.." "..value
+            str = str .. " " .. key .. " " .. value
         end
         return str
     end
 
     game.print("-----")
-    game.print("output "..contentKeyValueString(entity.get_output_inventory()))
-    -- game.print("module "..contentKeyValueString(entity.get_module_inventory()))
-    game.print("fuel "..contentKeyValueString(entity.get_fuel_inventory()))
-    game.print("burnt "..contentKeyValueString(entity.get_burnt_result_inventory()))
-    game.print("furnace_source "..contentKeyValueString(entity.get_inventory(defines.inventory.furnace_source)))
-    game.print("assembling_machine_input "..contentKeyValueString(entity.get_inventory(defines.inventory.assembling_machine_input)))
-    game.print("turretammo "..contentKeyValueString(entity.get_inventory(defines.inventory.turret_ammo)))
+    game.print("output " .. contentKeyValueString(entity.get_output_inventory()))
+    -- game.print("module " .. contentKeyValueString(entity.get_module_inventory()))
+    game.print("fuel " .. contentKeyValueString(entity.get_fuel_inventory()))
+    game.print("burnt " .. contentKeyValueString(entity.get_burnt_result_inventory()))
+    game.print("furnace_source " .. contentKeyValueString(entity.get_inventory(defines.inventory.furnace_source)))
+    game.print("assembling_machine_input " .. contentKeyValueString(entity.get_inventory(defines.inventory.assembling_machine_input)))
+    game.print("turretammo " .. contentKeyValueString(entity.get_inventory(defines.inventory.turret_ammo)))
 
     local keyValueString = function(table)
         if table == nil then
@@ -244,12 +244,12 @@ function print_inventory(entity)
         end
         local str = ""
         for key,value in pairs(table) do
-            str = str.." "..key.." "..value
+            str = str .. " " .. key .. " " .. value
         end
         return str
     end
 
-    game.print("fluid "..keyValueString(entity.get_fluid_contents()))
+    game.print("fluid " .. keyValueString(entity.get_fluid_contents()))
 end
 
 function deposit_res(playerId, itemName, itemDepositCount)
@@ -311,17 +311,17 @@ function print_recipe(entity)
 
     local str = ""
     for _,ingredient in ipairs(recipe.ingredients) do
-        str = str.." "..ingredient.name.." "..ingredient.amount
+        str = str .. " " .. ingredient.name .. " " .. ingredient.amount
     end
-    str = str.." >>"
+    str = str .. " >>"
     for _,product in ipairs(recipe.products) do
-        str = str.." "..product.name.." "..product.amount
+        str = str .. " " .. product.name .. " " .. product.amount
     end
-    game.print(entity.prototype.name.." recipe "..str)
+    game.print(entity.prototype.name .. " recipe " .. str)
 end
 
 function try_get_from_entity(playerId, entity, itemName, itemCount, inventory)
-    -- game.print(name.." "..n)
+    -- game.print(name .. " " .. n)
     local itemSpace = can_insert_res(playerId, itemName)
     if itemCount > itemSpace then
         itemCount = itemSpace
@@ -612,7 +612,7 @@ end
 function on_sel_change(event)
     if event.element.name == "gui_ft_setting" then
         furnace_type_index = event.element.selected_index
-        game.get_player(event.player_index).gui.top["furnace_type"].caption = "FT="..ft_source()
+        game.get_player(event.player_index).gui.top["furnace_type"].caption = "FT=" .. ft_source()
     end
 end
 
@@ -638,7 +638,7 @@ function on_gui_click(event)
         if event.shift then
             local p = game.item_prototypes[event.element.name]
             if p == nil or p.stack_size == nil then
-                game.print(event.element.name.." is nil")
+                game.print(event.element.name .. " is nil")
             else
                 itemCount = game.item_prototypes[event.element.name].stack_size
             end
@@ -674,9 +674,9 @@ function create_gui(root, index)
     -- local btn = root.add{ type = "button", caption = "FT", name = "furnace_type" }
 
     for itemName,v1 in pairs(reslist[index]) do
-        local str = "item/"..itemName
+        local str = "item/" .. itemName
         if is_fluid(k1) then
-            str = "fluid/"..itemName
+            str = "fluid/" .. itemName
         end
         gui[index].restable.add{ type = "sprite-button", sprite = str, name = itemName, visible = nil }
     end
@@ -685,7 +685,7 @@ end
 function show()
     for _,player in ipairs(game.connected_players) do
         local entityCaption = function()
-            return "entity "..entity_size_str(player.index)
+            return "entity " .. entity_size_str(player.index)
         end
 
         local res = reslist[player.index]
@@ -706,7 +706,7 @@ function show()
             resourceListIcon.number = itemStorage.count
             resourceListIcon.tooltip = itemStorage.count
             if not is_fluid(itemName) then
-                resourceListIcon.tooltip = resourceListIcon.tooltip..itemName..". Click to get.[Left=1 Right=5 Shift+L=Stack Shift+R=Half stack]"
+                resourceListIcon.tooltip = resourceListIcon.tooltip .. itemName .. ". Click to get.[Left=1 Right=5 Shift+L=Stack Shift+R=Half stack]"
             end
             if itemStorage.count == 0 and settings.global["show-resources-with-0"].value == false then
                 resourceListIcon.visible = false
@@ -725,7 +725,7 @@ function new_entity(entity)
     end
 
     if entity.last_user == nil then
-        game.print(entity.prototype.name.." has no last_user")
+        game.print(entity.prototype.name .. " has no last_user")
         return
     end
 
@@ -772,7 +772,7 @@ function remove_entity(entity)
             return
         end
 
-        game.print("unknown entity "..entity.prototype.name)
+        game.print("unknown entity " .. entity.prototype.name)
         return
     end
 
@@ -850,22 +850,22 @@ script.on_event(defines.events.on_entity_died, on_entity_died)
 script.on_event(defines.events.on_player_mined_entity, on_player_mined_entity)
 
 script.on_event(defines.events.on_robot_built_entity, function(event)
-    -- game.print("robot build entity "..event.created_entity.prototype.name)
+    -- game.print("robot build entity " .. event.created_entity.prototype.name)
     new_entity(event.created_entity)
 end)
 
 script.on_event(defines.events.on_entity_cloned, function(event)
-    -- game.print("clone entity "..event.destination.prototype.name)
+    -- game.print("clone entity " .. event.destination.prototype.name)
     new_entity(event.destination)
 end)
 
 script.on_event(defines.events.on_trigger_created_entity, function(event)
-    -- game.print("trigger create entity "..event.entity.prototype.name)
+    -- game.print("trigger create entity " .. event.entity.prototype.name)
     new_entity(event.entity)
 end)
 
 script.on_event(defines.events.on_robot_mined_entity, function(event)
-    -- game.print("robot mine entity "..event.entity.prototype.name)
+    -- game.print("robot mine entity " .. event.entity.prototype.name)
     remove_entity(event.entity)
 end)
 
