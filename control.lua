@@ -499,8 +499,8 @@ function do_lab(playerId, entity)
     return true
 end
 
-function do_ssp(player, entity)
-    try_get_from_entity(player, entity, "space-science-pack", 2000, entity.get_output_inventory())
+function do_ssp(playerId, entity)
+    try_get_from_entity(playerId, entity, "space-science-pack", 2000, entity.get_output_inventory())
 end
 
 function do_furnace(playerId, entityObj)
