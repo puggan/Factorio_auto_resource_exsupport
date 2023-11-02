@@ -542,7 +542,33 @@ function do_furnace(playerId, entityObj)
     end
 end
 
+function do_empty(playerId, entity)
+    for fluidName,fluidCount in pairs(entity.get_fluid_contents()) do
+        fluidCount = entity.remove_fluid{ name = fluidName, amount = fluidCount }
+        if fluidCount > 0 then
+            deposit_res(playerId, fluidName, fluidCount)
+        end
+    end
+
+    for inventorySlot = 1, entity.get_max_inventory_index() do
+        local inventory = entity.get_inventory(inventorySlot)
+        if inventory ~= nil then
+            for itemName,itemCount in pairs(inventory.get_contents()) do
+                itemCount = inventory.remove{ name = itemName, count = itemCount }
+                if itemCount > 0 then
+                    deposit_res(playerId, itemName, itemCount)
+                end
+            end
+        end
+    end
+end
+
 function harvest_feed_entity(playerId, entityObj)
+    if entityObj.entity.to_be_deconstructed() then
+        do_empty(playerId, entityObj.entity)
+        return
+    end
+
     if entityObj.entity.prototype.name == "rocket-silo" then
         do_ssp(playerId, entityObj.entity)
     end
