@@ -253,10 +253,6 @@ function deposit_res(playerId, itemName, itemDepositCount)
         -- item not tracked/stored
         return 0
     end
-    local objSpace = obj.max - obj.count
-    if itemDepositCount > objSpace then
-        itemDepositCount = objSpace
-    end
     if itemDepositCount <= 0 then
         return 0
     end
