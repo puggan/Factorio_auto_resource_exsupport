@@ -100,6 +100,7 @@ function is_accepted_type(entity)
     return is_machine(entity)
             or is_chest(entity)
             or need_fuel(entity)
+            or need_ammo(entity)
             or is_lab(entity)
 end
 
